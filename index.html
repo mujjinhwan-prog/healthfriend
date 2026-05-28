@@ -73,8 +73,9 @@
     background: var(--teal); color: #fff; border-radius: 999px;
     min-width: 22px; height: 22px; display: inline-flex;
     align-items: center; justify-content: center; font-size: 13px;
-    font-weight: 700; margin-top: 1px;
+    font-weight: 700; margin-top: 1px; flex-shrink: 0;
   }
+  .banner-text { flex: 1; min-width: 0; }
 
   section.card {
     background: #fff; border-radius: 16px; padding: 22px; margin-top: 18px;
@@ -368,8 +369,8 @@ function renderUser() {
   let html = '<div class="fade-in">';
 
   html += '<div class="banner"><span class="banner-icon">✓</span>' +
-    '아래 목록에서 받고 싶은 영상을 <strong>체크</strong>하거나, 원하는 ' +
-    '유튜브 영상의 <strong>URL을 직접 입력</strong>한 뒤 신청하세요.</div>';
+    '<span class="banner-text">아래 목록에서 받고 싶은 영상을 <strong>체크</strong>하거나, 원하는 ' +
+    '유튜브 영상의 <strong>URL을 직접 입력</strong>한 뒤 신청하세요.</span></div>';
 
   html += '<section class="card"><div class="section-head">' +
     '<h2 class="section-title">📺 신청 가능한 영상 목록</h2>' +
@@ -561,8 +562,8 @@ function renderAdmin() {
     '</div>';
 
   html += '<div class="banner"><span class="banner-icon">⚙</span>' +
-    '등록한 영상은 사용자 신청 페이지에 <strong>체크박스 목록</strong>으로 표시됩니다. ' +
-    '(이 목록은 현재 이 브라우저에 저장됩니다.)</div>';
+    '<span class="banner-text">등록한 영상은 사용자 신청 페이지에 <strong>체크박스 목록</strong>으로 표시됩니다. ' +
+    '(이 목록은 현재 이 브라우저에 저장됩니다.)</span></div>';
 
   /* 영상 추가/수정 폼 */
   const editing = state.editingId ? videos.find(v => v.id === state.editingId) : null;
