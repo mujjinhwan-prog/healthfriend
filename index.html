@@ -342,7 +342,7 @@ let state = {
   customMeta: {},
   adminAuthed: false,
   editingId: null, // 영상 수정 중인 ID
-  fName: "", fOrg: "", fEmail: "", fRecvEmail: "", fRecvEdited: false,
+  fName: "", fOrg: "", fEmail: "", fRecvEmail: "",
 };
 
 /* ---------- 페이지 전환 ---------- */
@@ -426,8 +426,8 @@ function renderUser() {
     '<div class="form-grid">' +
       '<div><label class="label">이름</label><input class="txt" type="text" placeholder="유일한" value="' + esc(state.fName) + '" oninput="state.fName=this.value" /></div>' +
       '<div><label class="label">소속</label><input class="txt" type="text" placeholder="부서 / 지점" value="' + esc(state.fOrg) + '" oninput="state.fOrg=this.value" /></div>' +
-      '<div><label class="label">회사 이메일 (직원인증)</label><input class="txt" type="email" placeholder="****@yuhan.co.kr" value="' + esc(state.fEmail) + '" oninput="onCompanyEmailInput(this.value)" /></div>' +
-      '<div><label class="label">받으실 이메일 (변경가능)</label><input class="txt" type="email" placeholder="****@yuhan.co.kr" value="' + esc(state.fRecvEmail) + '" oninput="state.fRecvEmail=this.value; state.fRecvEdited=true" /></div>' +
+      '<div><label class="label">회사 이메일 (직원인증)</label><input class="txt" type="email" placeholder="***@yuhan.co.kr" value="' + esc(state.fEmail) + '" oninput="state.fEmail=this.value" /></div>' +
+      '<div><label class="label">받으실 이메일 (변경가능)</label><input class="txt" type="email" placeholder="ex) yuhan, naver, gmail 모든 e-mail" value="' + esc(state.fRecvEmail) + '" oninput="state.fRecvEmail=this.value" /></div>' +
     '</div>' +
     '<button class="submit-btn" onclick="submitRequest()">📩 영상받기 요청 (' + totalSelected + '건)</button>' +
     '<p class="mail-note">버튼을 누르면 메일 앱이 열리며 선택한 영상 목록이 자동으로 작성됩니다. 내용을 확인한 뒤 "보내기"를 누르면 ' + CONFIG.ADMIN_EMAIL + ' 로 전송됩니다.</p>' +
@@ -474,20 +474,6 @@ function removeCustom(idx) {
   });
   state.customMeta = newMeta;
   renderUser();
-}
-
-function onCompanyEmailInput(value) {
-  state.fEmail = value;
-  // 사용자가 받으실 이메일을 아직 직접 수정하지 않았다면, 회사 이메일 값을 자동으로 따라 채움
-  if (!state.fRecvEdited) {
-    state.fRecvEmail = value;
-    renderUser();
-    // 회사 이메일 입력 포커스 유지
-    setTimeout(() => {
-      const inputs = document.querySelectorAll('#userPage input[type="email"]');
-      if (inputs[0]) { inputs[0].focus(); inputs[0].setSelectionRange(value.length, value.length); }
-    }, 0);
-  }
 }
 
 function submitRequest() {
