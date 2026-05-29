@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>건강의 벗도 보이(VOY)나요?</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root {
     --teal: #3ca44d;
@@ -288,10 +289,16 @@ const CONFIG = {
   // Supabase 연결 정보 (영상 목록을 공유 저장)
   SUPABASE_URL: "https://jiaccvnamqoshnxbyoud.supabase.co",
   SUPABASE_KEY: "sb_publishable_etPefDosp2zFZaUoqlFHNQ_n2gQQIyp",
+  // EmailJS 연결 정보 (메일 자동 발송)
+  EMAILJS_SERVICE_ID: "service_nm5snj8",
+  EMAILJS_TEMPLATE_ID: "template_45dgp8p",
+  EMAILJS_PUBLIC_KEY: "0iWQ2MVT_t4EydwyZ",
 };
 
 // Supabase 클라이언트 생성
 const sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+// EmailJS 초기화
+emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
 
 const STORAGE_KEY = "voy-video-list";
 const PW_KEY = "voy-admin-pw-hash";
@@ -473,7 +480,7 @@ function renderUser() {
       '<div><label class="label">받으실 이메일 (변경가능)</label><input class="txt" type="email" placeholder="ex) yuhan, naver, gmail 모든 e-mail" value="' + esc(state.fRecvEmail) + '" oninput="state.fRecvEmail=this.value" /></div>' +
     '</div>' +
     '<button class="submit-btn" onclick="submitRequest()">📩 영상받기 요청 (' + totalSelected + '건)</button>' +
-    '<p class="mail-note">버튼을 누르면 메일 앱이 열리며 선택한 영상 목록이 자동으로 작성됩니다. 내용을 확인한 뒤 "보내기"를 누르면 ' + CONFIG.ADMIN_EMAIL + ' 로 전송됩니다.</p>' +
+    '<p class="mail-note">버튼을 누르면 신청 내용이 ' + CONFIG.ADMIN_EMAIL + ' 로 자동 발송됩니다.</p>' +
     '</section>';
 
   html += '</div>';
@@ -519,7 +526,7 @@ function removeCustom(idx) {
   renderUser();
 }
 
-function submitRequest() {
+async function submitRequest() {
   const name = state.fName.trim();
   const org = state.fOrg.trim();
   const email = state.fEmail.trim();
@@ -540,6 +547,7 @@ function submitRequest() {
     alert("최소 한 개 이상의 영상을 선택하거나 URL을 입력해 주세요."); return;
   }
 
+  // 메일 본문 작성
   let body = "";
   body += "===== 건강의 벗도 보이(VOY)나요? 영상받기 요청 =====\n\n";
   body += "■ 이름: " + name + "\n";
@@ -571,9 +579,36 @@ function submitRequest() {
   body += "-------------------------------\n\n총 " + (no - 1) + "개 영상 신청\n";
 
   const subject = "[VOY 영상받기 요청] " + org + " " + name + " (" + (no - 1) + "건)";
-  window.location.href = "mailto:" + CONFIG.ADMIN_EMAIL +
-    "?subject=" + encodeURIComponent(subject) +
-    "&body=" + encodeURIComponent(body);
+
+  // 신청 버튼 비활성화
+  const submitBtn = document.querySelector("#userPage .submit-btn");
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "📤 발송 중..."; }
+
+  // EmailJS로 자동 발송
+  try {
+    await emailjs.send(
+      CONFIG.EMAILJS_SERVICE_ID,
+      CONFIG.EMAILJS_TEMPLATE_ID,
+      {
+        subject: subject,
+        message: body,
+        from_name: org + " " + name,
+        reply_to: recvEmail,
+      }
+    );
+    // 성공: 화면 초기화 + 안내
+    alert("✅ 신청이 정상적으로 발송되었습니다!\n\n관리자에게 메일이 전달되었으며, 영상은 입력하신 받으실 이메일(" + recvEmail + ")로 전달될 예정입니다.");
+    // 입력값 초기화
+    state.checked = {};
+    state.customUrls = ["", "", "", "", ""];
+    state.customMeta = {};
+    state.fName = ""; state.fOrg = ""; state.fEmail = ""; state.fRecvEmail = "";
+    renderUser();
+  } catch (err) {
+    console.error("메일 발송 실패:", err);
+    alert("❌ 메일 발송에 실패했습니다.\n\n잠시 후 다시 시도해 주시거나, 관리자에게 직접 문의해 주세요.\n(오류: " + (err && err.text ? err.text : "알 수 없는 오류") + ")");
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "📩 영상받기 요청"; }
+  }
 }
 
 /* ================================================================
