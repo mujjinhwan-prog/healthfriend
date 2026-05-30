@@ -422,7 +422,7 @@ function renderUser() {
     '유튜브 영상의 <strong>URL을 직접 입력</strong>한 뒤 신청하세요.</span></div>';
 
   html += '<section class="card"><div class="section-head">' +
-    '<h2 class="section-title">📺 신청 가능한 영상 목록</h2>' +
+    '<h2 class="section-title">📺 바로 활용 가능한 영상 리스트</h2>' +
     (totalSelected > 0 ? '<span class="count-badge">' + totalSelected + '개 선택됨</span>' : '') +
     '</div>';
 
@@ -480,7 +480,7 @@ function renderUser() {
       '<div><label class="label">받으실 이메일 (변경가능)</label><input class="txt" type="email" placeholder="ex) yuhan, naver, gmail 모든 e-mail" value="' + esc(state.fRecvEmail) + '" oninput="state.fRecvEmail=this.value" /></div>' +
     '</div>' +
     '<button class="submit-btn" onclick="submitRequest()">📩 영상받기 요청 (' + totalSelected + '건)</button>' +
-    '<p class="mail-note">버튼을 누르면 신청 내용이 ' + CONFIG.ADMIN_EMAIL + ' 로 자동 발송됩니다.</p>' +
+    '<p class="mail-note">영상받기 요청을 하시면 받으실 이메일로 파일을 보내드립니다. 바로 활용 가능한 영상은 확인되는대로 받으실 수 있고 원하는 영상은 시일이 걸릴 수 있으니 참고 바랍니다.</p>' +
     '</section>';
 
   html += '</div>';
