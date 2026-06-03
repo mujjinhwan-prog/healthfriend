@@ -312,35 +312,28 @@
 
 <script>
 /* ===================================================================
-   설정 — 관리자만 알면 되는 값
-   비밀번호는 평문이 아니라 SHA-256 해시로 저장됩니다.
-   기본 비밀번호: voyisvote2026
-   웹사이트에서 비밀번호를 변경하면 그 변경된 해시가 localStorage에 저장되고
-   이후 그 값이 우선 사용됩니다.
+   Application configuration
    =================================================================== */
 const CONFIG = {
   ADMIN_EMAIL: "funnyair@yuhan.co.kr",
-  // 'voyisvote2026' 의 SHA-256 해시값
   DEFAULT_PW_HASH: "6dc6765d0e9f527c36160d071003fe0281b8b559b0bd534a7a5666db97842e99",
   CHANNEL_URL: "https://www.youtube.com/@health_f",
-  // Supabase 연결 정보 (영상 목록을 공유 저장)
   SUPABASE_URL: "https://jiaccvnamqoshnxbyoud.supabase.co",
   SUPABASE_KEY: "sb_publishable_etPefDosp2zFZaUoqlFHNQ_n2gQQIyp",
-  // EmailJS 연결 정보 (메일 자동 발송)
   EMAILJS_SERVICE_ID: "service_nm5snj8",
   EMAILJS_TEMPLATE_ID: "template_45dgp8p",
   EMAILJS_PUBLIC_KEY: "0iWQ2MVT_t4EydwyZ",
 };
 
-// Supabase 클라이언트 생성
+
 const sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
-// EmailJS 초기화
+
 emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
 
 const STORAGE_KEY = "voy-video-list";
 const PW_KEY = "voy-admin-pw-hash";
 
-/* ---------- 비밀번호 해시 ---------- */
+/* ---------- hash ---------- */
 async function sha256(text) {
   const buf = new TextEncoder().encode(text);
   const hash = await crypto.subtle.digest("SHA-256", buf);
@@ -354,7 +347,7 @@ function setStoredHash(hash) {
   localStorage.setItem(PW_KEY, hash);
 }
 
-/* ---------- 유틸 ---------- */
+/* ---------- utils ---------- */
 function extractVideoId(url) {
   if (!url) return null;
   const patterns = [
@@ -385,8 +378,8 @@ function esc(s) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-/* ---------- 영상 목록 저장/불러오기 (Supabase) ---------- */
-let videoCache = []; // 메모리 캐시 (렌더링용 즉시 접근)
+/* ---------- data ---------- */
+let videoCache = []; 
 
 async function loadVideos() {
   try {
@@ -396,7 +389,7 @@ async function loadVideos() {
       .order("sort_order", { ascending: true })
       .order("id", { ascending: true });
     if (error) throw error;
-    // DB 컬럼명 → 기존 코드가 쓰는 필드명으로 매핑
+    
     videoCache = (data || []).map(r => ({
       id: String(r.id),
       videoId: r.video_id,
@@ -411,20 +404,20 @@ async function loadVideos() {
     return videoCache; // 실패 시 기존 캐시 유지
   }
 }
-function getVideos() { return videoCache; } // 동기 접근용
+function getVideos() { return videoCache; } 
 
-/* ---------- 상태 ---------- */
+/* ---------- state ---------- */
 let state = {
   page: "user",
   checked: {},
   customUrls: ["", "", "", "", ""],
   customMeta: {},
   adminAuthed: false,
-  editingId: null, // 영상 수정 중인 ID
+  editingId: null, 
   fName: "", fOrg: "", fEmail: "", fRecvEmail: "", fMemo: "",
 };
 
-/* ---------- 페이지 전환 ---------- */
+/* ---------- routing ---------- */
 function showPage(page) {
   state.page = page;
   document.getElementById("navUser").classList.toggle("active", page === "user");
@@ -433,7 +426,7 @@ function showPage(page) {
   document.getElementById("adminPage").classList.toggle("hidden", page !== "admin");
   if (page === "user") renderUser();
   else renderAdmin();
-  // 페이지 전환 시 항상 최신 데이터 동기화
+  
   (async () => {
     await loadVideos();
     if (state.page === page) {
@@ -443,9 +436,7 @@ function showPage(page) {
   })();
 }
 
-/* ================================================================
-   사용자 페이지
-   ================================================================ */
+/* ---------- page A ---------- */
 function renderUser() {
   const videos = getVideos();
   const totalSelected =
@@ -570,7 +561,7 @@ async function submitRequest() {
   const email = state.fEmail.trim();
   let recvEmail = state.fRecvEmail.trim();
   const memo = (state.fMemo || "").trim();
-  if (!recvEmail) recvEmail = email; // 받으실 이메일이 비어있으면 회사 이메일 사용
+  if (!recvEmail) recvEmail = email; 
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!name || !org || !email) { showAlert("이름, 소속, 회사 이메일을 모두 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   if (!emailRe.test(email)) { showAlert("올바른 회사 이메일 형식을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
@@ -586,7 +577,7 @@ async function submitRequest() {
     showAlert("최소 한 개 이상의 영상을 선택하거나 URL을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return;
   }
 
-  // 메일 본문 작성
+  
   let body = "";
   body += "===== 건강의 벗도 보이(VOY)나요? 영상받기 요청 =====\n\n";
   body += "■ 이름: " + name + "\n";
@@ -625,11 +616,11 @@ async function submitRequest() {
 
   const subject = "[VOY 영상받기 요청] " + org + " " + name + " (" + (no - 1) + "건)";
 
-  // 신청 버튼 비활성화
+  
   const submitBtn = document.querySelector("#userPage .submit-btn");
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "📤 발송 중..."; }
 
-  // EmailJS로 자동 발송
+  
   try {
     await emailjs.send(
       CONFIG.EMAILJS_SERVICE_ID,
@@ -641,9 +632,9 @@ async function submitRequest() {
         reply_to: recvEmail,
       }
     );
-    // 성공: 화면 초기화 + 안내
+    
     await showAlert("관리자에게 메일이 전달되었으며, 영상은 입력하신 받으실 이메일(" + recvEmail + ")로 전달될 예정입니다.", { icon: "✅", title: "신청이 정상적으로 발송되었습니다" });
-    // 입력값 초기화
+    
     state.checked = {};
     state.customUrls = ["", "", "", "", ""];
     state.customMeta = {};
@@ -656,9 +647,7 @@ async function submitRequest() {
   }
 }
 
-/* ================================================================
-   관리자 페이지
-   ================================================================ */
+/* ---------- page B ---------- */
 function renderAdmin() {
   if (!state.adminAuthed) {
     document.getElementById("adminPage").innerHTML =
@@ -781,7 +770,7 @@ async function addVideo() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  // 새 영상은 정렬 순서를 마지막으로 (현재 최대값 + 1)
+  
   const maxOrder = videoCache.reduce((m, v) => Math.max(m, v.sort_order || 0), 0);
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "추가 중..."; }
   const { error } = await sb.from("videos").insert({
@@ -830,10 +819,10 @@ async function moveVideo(id, dir) {
   const i = videos.findIndex(v => v.id === id);
   const j = i + dir;
   if (i === -1 || j < 0 || j >= videos.length) return;
-  // 두 항목의 sort_order를 서로 교환
+  
   const a = videos[i], b = videos[j];
   const aOrder = a.sort_order, bOrder = b.sort_order;
-  // 둘이 같은 값이면 강제로 다르게 만듦
+  
   const newA = bOrder, newB = (aOrder === bOrder) ? bOrder + (dir > 0 ? -1 : 1) : aOrder;
   const r1 = await sb.from("videos").update({ sort_order: newA }).eq("id", Number(a.id));
   const r2 = await sb.from("videos").update({ sort_order: newB }).eq("id", Number(b.id));
@@ -842,7 +831,7 @@ async function moveVideo(id, dir) {
   renderAdmin();
 }
 
-/* ---------- 비밀번호 변경 모달 ---------- */
+/* ---------- pw modal ---------- */
 function openChangePwModal() {
   document.getElementById("modalContainer").innerHTML =
     '<div class="modal-bg" onclick="if(event.target===this)closeModal()">' +
@@ -866,7 +855,7 @@ function closeModal() {
   document.getElementById("modalContainer").innerHTML = "";
 }
 
-/* ---------- 예쁜 알림창 (브라우저 기본 alert 대체) ---------- */
+/* ---------- alert ---------- */
 function showAlert(message, options) {
   options = options || {};
   const icon = options.icon || "ℹ️";
@@ -926,10 +915,10 @@ async function changePassword() {
   showAlert("비밀번호가 변경되었습니다.", { icon: "✅", title: "변경 완료" });
 }
 
-/* ---------- 초기화 ---------- */
+/* ---------- init ---------- */
 document.getElementById("footerText").textContent =
   "ⓒ 2026 YUHAN Sales Planning Team. All rights reserved.";
-// 먼저 빈 화면을 그리고, Supabase에서 목록 불러오면 다시 그림
+
 renderUser();
 (async () => {
   await loadVideos();
