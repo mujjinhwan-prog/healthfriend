@@ -8,13 +8,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root {
-    --teal: #3ca44d;
-    --teal-dark: #2e8a3d;
-    --teal-soft: #e6f4e8;
-    --ink: #1f2b20;
-    --paper: #f5f9f5;
-    --muted: #6f7d70;
-    --border: #e6efe6;
+    --teal: #1f6b3a;              /* 짙은 녹색 (메인) */
+    --teal-dark: #14472a;         /* 더 짙은 녹색 (헤더 그라데이션 끝) */
+    --teal-soft: #e8f0ea;         /* 아주 연한 녹색 (배너 배경) */
+    --navy: #2a3b5c;              /* 네이비 (액센트, 텍스트) */
+    --navy-soft: #eef1f7;         /* 연한 네이비 (보조 배경) */
+    --ink: #1a2332;               /* 본문 글자 (네이비 톤) */
+    --paper: #f4f5f7;             /* 전체 배경 (중립 그레이) */
+    --muted: #697386;             /* 회색 보조 글자 */
+    --border: #e2e5eb;            /* 회색 테두리 */
     --danger: #c0504a;
   }
   * { box-sizing: border-box; }
@@ -33,7 +35,7 @@
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
     color: #fff;
     padding: 22px 0;
-    box-shadow: 0 2px 14px rgba(46,138,61,.25);
+    box-shadow: 0 2px 14px rgba(20,71,42,.25);
   }
   .header-inner {
     max-width: 760px; margin: 0 auto; padding: 0 20px;
@@ -66,7 +68,7 @@
   main { max-width: 760px; margin: 0 auto; padding: 26px 20px 60px; }
 
   .banner {
-    background: var(--teal-soft); border: 1px solid rgba(60,164,77,.2);
+    background: var(--teal-soft); border: 1px solid rgba(31,107,58,.2);
     border-radius: 12px; padding: 14px 18px; font-size: 14px;
     line-height: 1.6; color: var(--teal-dark);
     display: flex; gap: 10px; align-items: flex-start;
@@ -87,7 +89,7 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
   }
-  .section-title { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .section-title { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--navy); }
   .count-badge {
     background: var(--teal); color: #fff; border-radius: 999px;
     padding: 4px 12px; font-size: 13px; font-weight: 700;
@@ -113,7 +115,7 @@
     transition: all .15s;
   }
   .video-row.clickable { cursor: pointer; }
-  .video-row.checked { border: 2px solid var(--teal); background: #eef7ef; }
+  .video-row.checked { border: 2px solid var(--teal); background: #e8f0ea; }
   .video-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--teal); flex-shrink: 0; }
   .thumb {
     width: 100px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px;
@@ -147,7 +149,7 @@
     transition: all .15s;
   }
   .video-card:hover { border-color: #c8d8c8; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.06); }
-  .video-card.checked { border: 2px solid var(--teal); background: #eef7ef; }
+  .video-card.checked { border: 2px solid var(--teal); background: #e8f0ea; }
   .video-card-thumb-wrap {
     position: relative;
     width: 100%; aspect-ratio: 16 / 9; background: #e6efe6;
@@ -172,6 +174,7 @@
   .video-card-body { padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; }
   .video-card-title {
     font-weight: 700; font-size: 13.5px; line-height: 1.4;
+    color: var(--navy);
     overflow: hidden; text-overflow: ellipsis;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     word-break: break-word;
@@ -277,7 +280,7 @@
   select.txt { cursor: pointer; appearance: menulist; }
   input.txt:focus, textarea.txt:focus, select.txt:focus {
     outline: none; border-color: var(--teal);
-    box-shadow: 0 0 0 3px rgba(60,164,77,.15);
+    box-shadow: 0 0 0 3px rgba(31,107,58,.15);
   }
   .preview-box {
     display: flex; align-items: center; gap: 10px; margin-top: 8px;
@@ -303,7 +306,7 @@
     margin-top: 18px; width: 100%;
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
     color: #fff; border: none; border-radius: 12px; padding: 15px;
-    font-size: 16px; font-weight: 800; box-shadow: 0 4px 14px rgba(60,164,77,.35);
+    font-size: 16px; font-weight: 800; box-shadow: 0 4px 14px rgba(31,107,58,.35);
     cursor: pointer; font-family: inherit;
   }
   .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -364,7 +367,11 @@
   .alert-actions { display: flex; gap: 8px; }
   .alert-actions button { flex: 1; }
 
-  footer { text-align: center; padding: 24px 20px 40px; font-size: 12.5px; color: #8a9a98; }
+  footer {
+    text-align: center; padding: 28px 20px 36px; font-size: 12.5px;
+    color: #c9d2e0; background: var(--navy); margin-top: 40px;
+    letter-spacing: 0.3px;
+  }
   .hidden { display: none; }
 </style>
 </head>
