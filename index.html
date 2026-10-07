@@ -133,11 +133,90 @@
   .video-meta { display: flex; gap: 12px; font-size: 12px; color: #8a9a98; margin-top: 4px; align-items: center; flex-wrap: wrap; }
   .video-meta a { color: var(--teal); text-decoration: none; font-weight: 600; }
 
-  /* 모바일: 썸네일 아래로 제목을 펼쳐서 가로 폭 꽉 채움 */
+  /* === 사용자 페이지 전용: 3열 카드 그리드 === */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .video-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    border-radius: 12px; border: 1px solid var(--border); background: #fff;
+    overflow: hidden; cursor: pointer;
+    transition: all .15s;
+  }
+  .video-card:hover { border-color: #c8d8c8; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.06); }
+  .video-card.checked { border: 2px solid var(--teal); background: #eef7ef; }
+  .video-card-thumb-wrap {
+    position: relative;
+    width: 100%; aspect-ratio: 16 / 9; background: #e6efe6;
+    overflow: hidden;
+  }
+  .video-card-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-card-check {
+    position: absolute; top: 8px; left: 8px;
+    width: 24px; height: 24px;
+    background: rgba(255,255,255,.95);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  }
+  .video-card-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--teal); margin: 0; cursor: pointer; }
+  .video-card-duration {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(0,0,0,.72); color: #fff;
+    font-size: 11.5px; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .video-card-body { padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; }
+  .video-card-title {
+    font-weight: 700; font-size: 13.5px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    word-break: break-word;
+    min-height: 2.8em;
+  }
+  .video-card-desc {
+    font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  }
+  .cat-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px; color: #fff;
+    margin-top: 8px; align-self: flex-start;
+  }
+
+  /* 카테고리 필터 탭 */
+  .cat-filter {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+  }
+  .cat-tab {
+    background: #fff; border: 1.5px solid var(--border);
+    color: var(--muted); border-radius: 999px;
+    padding: 5px 12px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+  }
+  .cat-tab:hover { border-color: var(--teal); color: var(--teal-dark); }
+  .cat-tab.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  /* 태블릿: 2열 */
+  @media (max-width: 760px) {
+    .video-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  /* 모바일: 1열 */
+  @media (max-width: 480px) {
+    .video-grid { grid-template-columns: 1fr; gap: 10px; }
+    .video-card-title { font-size: 14px; }
+  }
+
+  /* === 관리자 리스트: 모바일 레이아웃 유지 === */
   @media (max-width: 560px) {
     .video-row {
       display: grid;
-      grid-template-columns: auto auto 1fr;  /* 체크박스, 썸네일, 빈공간 */
+      grid-template-columns: auto auto 1fr;
       grid-template-areas:
         "check thumb meta"
         "title title title"
@@ -165,6 +244,11 @@
   }
 
   .row-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+  .row-cat-select {
+    background: #fff; border: 1.5px solid var(--border); color: var(--ink);
+    border-radius: 8px; padding: 5px 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit; max-width: 110px;
+  }
   .icon-btn {
     background: #fff; border: 1px solid var(--border); border-radius: 6px;
     width: 30px; height: 28px; font-size: 14px; cursor: pointer;
@@ -182,15 +266,16 @@
     justify-content: center; font-weight: 700; color: var(--muted);
     font-size: 14px; flex-shrink: 0;
   }
-  input.txt, textarea.txt {
+  input.txt, textarea.txt, select.txt {
     width: 100%; padding: 11px 14px; border-radius: 10px;
     border: 1.5px solid #d8e3e0; font-size: 14px; font-family: inherit;
-    transition: all .15s;
+    transition: all .15s; background: #fff;
   }
   textarea.txt {
     resize: vertical; min-height: 70px; line-height: 1.5;
   }
-  input.txt:focus, textarea.txt:focus {
+  select.txt { cursor: pointer; appearance: menulist; }
+  input.txt:focus, textarea.txt:focus, select.txt:focus {
     outline: none; border-color: var(--teal);
     box-shadow: 0 0 0 3px rgba(60,164,77,.15);
   }
@@ -396,6 +481,7 @@ async function loadVideos() {
       title: r.title,
       description: r.description || "",
       duration: r.duration || "",
+      category: r.category || "기타",
       sort_order: r.sort_order || 0,
     }));
     return videoCache;
@@ -407,14 +493,25 @@ async function loadVideos() {
 function getVideos() { return videoCache; } 
 
 /* ---------- state ---------- */
+const CATEGORIES = ["건강검진", "질환정보", "생활습관", "영양/식단", "운동/재활", "약물정보", "기타"];
+const CATEGORY_COLORS = {
+  "건강검진": "#3ca44d",
+  "질환정보": "#d97757",
+  "생활습관": "#5b8def",
+  "영양/식단": "#e8a33d",
+  "운동/재활": "#8b5cf6",
+  "약물정보": "#06a0a0",
+  "기타": "#8a9a98",
+};
 let state = {
   page: "user",
   checked: {},
   customUrls: ["", "", "", "", ""],
   customMeta: {},
   adminAuthed: false,
-  editingId: null, 
+  editingId: null,
   fName: "", fOrg: "", fEmail: "", fRecvEmail: "", fMemo: "",
+  filterCategory: "전체",
 };
 
 /* ---------- routing ---------- */
@@ -457,19 +554,50 @@ function renderUser() {
   if (videos.length === 0) {
     html += '<div class="empty-box">아직 등록된 영상이 없습니다. 아래에서 원하는 영상 URL을 직접 입력해 신청하실 수 있어요.</div>';
   } else {
-    html += '<div class="video-list">';
-    videos.forEach(v => {
-      const ck = state.checked[v.id];
-      html += '<label class="video-row clickable' + (ck ? ' checked' : '') + '">' +
-        '<input type="checkbox" ' + (ck ? 'checked' : '') + ' onchange="toggleCheck(\'' + v.id + '\')" />' +
-        '<img class="thumb" src="' + thumbUrl(v.videoId) + '" alt="" />' +
-        '<div class="video-info">' +
-          '<div class="video-title">' + esc(v.title) + '</div>' +
-          (v.description ? '<div class="video-desc">' + esc(v.description) + '</div>' : '') +
-          '<div class="video-meta">' + (v.duration ? '<span>⏱ ' + esc(v.duration) + '</span>' : '') + '</div>' +
-        '</div></label>';
+    // 카테고리 탭 (등록된 영상에 실제로 존재하는 카테고리만 노출)
+    const presentCats = Array.from(new Set(videos.map(v => v.category || "기타")));
+    const orderedCats = ["전체"].concat(CATEGORIES.filter(c => presentCats.indexOf(c) !== -1));
+    presentCats.forEach(c => { if (orderedCats.indexOf(c) === -1) orderedCats.push(c); });
+
+    html += '<div class="cat-filter">';
+    orderedCats.forEach(cat => {
+      const active = state.filterCategory === cat;
+      const count = cat === "전체" ? videos.length : videos.filter(v => (v.category || "기타") === cat).length;
+      html += '<button class="cat-tab' + (active ? ' active' : '') + '" onclick="setFilterCategory(\'' + esc(cat) + '\')">' +
+        esc(cat) + ' (' + count + ')</button>';
     });
     html += '</div>';
+
+    // 필터 적용된 리스트
+    const filtered = state.filterCategory === "전체"
+      ? videos
+      : videos.filter(v => (v.category || "기타") === state.filterCategory);
+
+    if (filtered.length === 0) {
+      html += '<div class="empty-box">이 카테고리에는 등록된 영상이 없습니다.</div>';
+    } else {
+      html += '<div class="video-grid">';
+      filtered.forEach(v => {
+        const ck = state.checked[v.id];
+        const cat = v.category || "기타";
+        const catColor = CATEGORY_COLORS[cat] || CATEGORY_COLORS["기타"];
+        html += '<div class="video-card' + (ck ? ' checked' : '') + '" onclick="toggleCheck(\'' + v.id + '\')">' +
+          '<div class="video-card-thumb-wrap">' +
+            '<img class="video-card-thumb" src="' + thumbUrl(v.videoId) + '" alt="" />' +
+            '<div class="video-card-check" onclick="event.stopPropagation()">' +
+              '<input type="checkbox" ' + (ck ? 'checked' : '') + ' onchange="toggleCheck(\'' + v.id + '\')" />' +
+            '</div>' +
+            (v.duration ? '<div class="video-card-duration">' + esc(v.duration) + '</div>' : '') +
+          '</div>' +
+          '<div class="video-card-body">' +
+            '<div class="video-card-title">' + esc(v.title) + '</div>' +
+            (v.description ? '<div class="video-card-desc">' + esc(v.description) + '</div>' : '') +
+            '<span class="cat-badge" style="background:' + catColor + '">' + esc(cat) + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
   }
   html += '</section>';
 
@@ -518,6 +646,10 @@ function renderUser() {
 
 function toggleCheck(id) {
   state.checked[id] = !state.checked[id];
+  renderUser();
+}
+function setFilterCategory(cat) {
+  state.filterCategory = cat;
   renderUser();
 }
 function onCustomInput(idx, value) {
@@ -591,6 +723,7 @@ async function submitRequest() {
     body += "\n[ 목록에서 선택한 영상 ]\n\n";
     selReg.forEach(v => {
       body += no + ". " + v.title + "\n";
+      if (v.category) body += "   분류: " + v.category + "\n";
       if (v.duration) body += "   길이: " + v.duration + "\n";
       body += "   URL: https://www.youtube.com/watch?v=" + v.videoId + "\n";
       body += "   썸네일: " + thumbUrl(v.videoId) + "\n\n";
@@ -696,6 +829,10 @@ function renderAdmin() {
         '<input class="txt" id="a-desc" type="text" placeholder="간단한 영상 소개" value="' + esc(editing ? editing.description : "") + '" /></div>' +
       '<div><label class="label">영상 길이 (직접 입력)</label>' +
         '<input class="txt" id="a-dur" type="text" placeholder="예: 12:34" value="' + esc(editing ? editing.duration : "") + '" /></div>' +
+      '<div><label class="label">카테고리 (종류)</label>' +
+        '<select class="txt" id="a-cat">' +
+          CATEGORIES.map(c => '<option value="' + esc(c) + '"' + ((editing && editing.category === c) || (!editing && c === "기타") ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
+        '</select></div>' +
     '</div>' +
     '<button class="submit-btn" onclick="' + (editing ? 'saveEdit()' : 'addVideo()') + '">' +
       (editing ? '수정 저장' : '목록에 추가') + '</button>' +
@@ -709,6 +846,11 @@ function renderAdmin() {
   } else {
     html += '<div class="video-list">';
     videos.forEach((v, idx) => {
+      const cat = v.category || "기타";
+      const catColor = CATEGORY_COLORS[cat] || CATEGORY_COLORS["기타"];
+      const catOptions = CATEGORIES.map(c =>
+        '<option value="' + esc(c) + '"' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>'
+      ).join('');
       html += '<div class="video-row">' +
         '<div class="row-actions">' +
           '<button class="icon-btn" onclick="moveVideo(\'' + v.id + '\', -1)" ' + (idx === 0 ? 'disabled' : '') + ' title="위로">▲</button>' +
@@ -720,10 +862,12 @@ function renderAdmin() {
           (v.description ? '<div class="video-desc">' + esc(v.description) + '</div>' : '') +
           '<div class="video-meta">' +
             (v.duration ? '<span>⏱ ' + esc(v.duration) + '</span>' : '') +
+            '<span class="cat-badge" style="background:' + catColor + '; margin-top:0">' + esc(cat) + '</span>' +
             '<a href="https://www.youtube.com/watch?v=' + v.videoId + '" target="_blank" rel="noopener">영상 보기 ↗</a>' +
           '</div>' +
         '</div>' +
         '<div class="row-actions">' +
+          '<select class="row-cat-select" onchange="quickChangeCategory(\'' + v.id + '\', this.value)" title="카테고리 변경">' + catOptions + '</select>' +
           '<button class="edit-btn" onclick="startEdit(\'' + v.id + '\')">수정</button>' +
           '<button class="delete-btn" onclick="deleteVideo(\'' + v.id + '\')">삭제</button>' +
         '</div>' +
@@ -770,11 +914,12 @@ async function addVideo() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  
+  const category = (document.getElementById("a-cat") || {}).value || "기타";
+
   const maxOrder = videoCache.reduce((m, v) => Math.max(m, v.sort_order || 0), 0);
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "추가 중..."; }
   const { error } = await sb.from("videos").insert({
-    video_id: vid, title, description, duration, sort_order: maxOrder + 1
+    video_id: vid, title, description, duration, category, sort_order: maxOrder + 1
   });
   if (error) { showAlert("영상 추가 실패: " + error.message, { icon: "❌", title: "오류" }); if (btn) { btn.disabled = false; btn.textContent = "목록에 추가"; } return; }
   await loadVideos();
@@ -797,9 +942,10 @@ async function saveEdit() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
+  const category = (document.getElementById("a-cat") || {}).value || "기타";
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "저장 중..."; }
   const { error } = await sb.from("videos").update({
-    video_id: vid, title, description, duration
+    video_id: vid, title, description, duration, category
   }).eq("id", Number(state.editingId));
   if (error) { showAlert("수정 실패: " + error.message, { icon: "❌", title: "오류" }); if (btn) { btn.disabled = false; btn.textContent = "수정 저장"; } return; }
   await loadVideos();
@@ -811,6 +957,12 @@ async function deleteVideo(id) {
   const { error } = await sb.from("videos").delete().eq("id", Number(id));
   if (error) { showAlert("삭제 실패: " + error.message, { icon: "❌", title: "오류" }); return; }
   if (state.editingId === id) state.editingId = null;
+  await loadVideos();
+  renderAdmin();
+}
+async function quickChangeCategory(id, newCat) {
+  const { error } = await sb.from("videos").update({ category: newCat }).eq("id", Number(id));
+  if (error) { showAlert("카테고리 변경 실패: " + error.message, { icon: "❌", title: "오류" }); return; }
   await loadVideos();
   renderAdmin();
 }
