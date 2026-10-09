@@ -198,6 +198,50 @@
     margin-top: 8px; align-self: flex-start;
   }
 
+  /* 선택된 영상 요약 바 */
+  .selected-bar {
+    background: var(--navy-soft); border: 1px solid #d6def0;
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+  }
+  .selected-bar-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; gap: 10px;
+  }
+  .selected-bar-title { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+  .selected-bar-count {
+    display: inline-block; background: var(--teal); color: #fff;
+    border-radius: 999px; padding: 1px 9px; font-size: 12px; margin-left: 4px;
+  }
+  .selected-bar-clear {
+    background: transparent; border: 1px solid #c7d1e2; color: var(--navy);
+    border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .selected-bar-clear:hover { background: #fff; }
+  .selected-bar-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .sel-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff; border: 1px solid #d6def0; border-radius: 999px;
+    padding: 3px 8px 3px 3px; max-width: 100%;
+  }
+  .sel-chip img { width: 28px; height: 16px; object-fit: cover; border-radius: 3px; display: block; }
+  .sel-chip-title {
+    font-size: 12px; font-weight: 600; color: var(--navy);
+    max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sel-chip-cat {
+    font-size: 10.5px; font-weight: 700; color: #fff;
+    padding: 1px 7px; border-radius: 999px; white-space: nowrap;
+  }
+  .sel-chip-x {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px;
+    font-family: inherit;
+  }
+  .sel-chip-x:hover { color: var(--danger); }
+
   /* 카테고리 필터 탭 */
   .cat-filter {
     display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
@@ -267,6 +311,18 @@
     border-radius: 8px; padding: 5px 8px; font-size: 12px; font-weight: 600;
     cursor: pointer; font-family: inherit; max-width: 110px;
   }
+  .cat-input-row {
+    display: flex; gap: 8px; align-items: stretch;
+  }
+  .cat-input-row select { flex: 1; }
+  .cat-add-btn {
+    background: #fff; border: 1.5px dashed var(--teal); color: var(--teal-dark);
+    border-radius: 10px; padding: 0 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    transition: all .15s;
+  }
+  .cat-add-btn:hover { background: var(--teal-soft); }
+  .cat-add-btn.active { background: var(--teal); border-style: solid; color: #fff; }
   .icon-btn {
     background: #fff; border: 1px solid var(--border); border-radius: 6px;
     width: 30px; height: 28px; font-size: 14px; cursor: pointer;
@@ -605,6 +661,28 @@ function renderUser() {
     });
     html += '</div>';
 
+    // 선택된 영상 요약 바 (다른 카테고리에서 선택한 영상 포함)
+    const checkedVideos = videos.filter(v => state.checked[v.id]);
+    if (checkedVideos.length > 0) {
+      html += '<div class="selected-bar">' +
+        '<div class="selected-bar-head">' +
+          '<span class="selected-bar-title">✓ 선택된 영상 <span class="selected-bar-count">' + checkedVideos.length + '</span></span>' +
+          '<button class="selected-bar-clear" onclick="clearAllChecked()">전체 해제</button>' +
+        '</div>' +
+        '<div class="selected-bar-chips">';
+      checkedVideos.forEach(v => {
+        const cat = v.category || "기타";
+        const catColor = colorForCategory(cat);
+        html += '<div class="sel-chip" title="' + esc(v.title) + '">' +
+          '<img src="' + thumbUrl(v.videoId) + '" alt="" />' +
+          '<span class="sel-chip-title">' + esc(v.title) + '</span>' +
+          '<span class="sel-chip-cat" style="background:' + catColor + '">' + esc(cat) + '</span>' +
+          '<button class="sel-chip-x" onclick="toggleCheck(\'' + v.id + '\')" aria-label="해제">×</button>' +
+        '</div>';
+      });
+      html += '</div></div>';
+    }
+
     // 필터 적용된 리스트
     const filtered = state.filterCategory === "전체"
       ? videos
@@ -617,7 +695,7 @@ function renderUser() {
       filtered.forEach(v => {
         const ck = state.checked[v.id];
         const cat = v.category || "기타";
-        const catColor = CATEGORY_COLORS[cat] || CATEGORY_COLORS["기타"];
+        const catColor = colorForCategory(cat);
         html += '<div class="video-card' + (ck ? ' checked' : '') + '" onclick="toggleCheck(\'' + v.id + '\')">' +
           '<div class="video-card-thumb-wrap">' +
             '<img class="video-card-thumb" src="' + thumbUrl(v.videoId) + '" alt="" />' +
@@ -687,6 +765,10 @@ function toggleCheck(id) {
 }
 function setFilterCategory(cat) {
   state.filterCategory = cat;
+  renderUser();
+}
+function clearAllChecked() {
+  state.checked = {};
   renderUser();
 }
 function onCustomInput(idx, value) {
@@ -866,13 +948,26 @@ function renderAdmin() {
         '<input class="txt" id="a-desc" type="text" placeholder="간단한 영상 소개" value="' + esc(editing ? editing.description : "") + '" /></div>' +
       '<div><label class="label">영상 길이 (직접 입력)</label>' +
         '<input class="txt" id="a-dur" type="text" placeholder="예: 12:34" value="' + esc(editing ? editing.duration : "") + '" /></div>' +
-      '<div><label class="label">카테고리 (종류)</label>' +
-        '<select class="txt" id="a-cat">' +
-          CATEGORIES.map(c => '<option value="' + esc(c) + '"' + ((editing && editing.category === c) || (!editing && c === "기본") ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
-        '</select></div>' +
+      '<div style="grid-column:1/-1"><label class="label">카테고리 (종류)</label>' +
+        (function(){
+          const allCats = getAllCategories();
+          const currentCat = editing ? editing.category : "기본";
+          if (currentCat && allCats.indexOf(currentCat) === -1) allCats.push(currentCat);
+          return '<div class="cat-input-row">' +
+            '<select class="txt" id="a-cat" onchange="onCatSelectChange()">' +
+              allCats.map(c => '<option value="' + esc(c) + '"' + (c === currentCat ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
+            '</select>' +
+            '<button type="button" class="cat-add-btn" onclick="toggleCatInput()" id="catAddBtn">+ 직접 입력</button>' +
+          '</div>' +
+          '<input class="txt hidden" id="a-cat-custom" type="text" placeholder="새 카테고리 이름 (예: 소아 건강, 멘탈케어 등)" style="margin-top:8px" />';
+        })() +
+      '</div>' +
     '</div>' +
-    '<button class="submit-btn" onclick="' + (editing ? 'saveEdit()' : 'addVideo()') + '">' +
-      (editing ? '수정 저장' : '목록에 추가') + '</button>' +
+    '<div style="display:flex; gap:10px; margin-top:8px;">' +
+      '<button class="submit-btn" style="flex:1" onclick="' + (editing ? 'saveEdit()' : 'addVideo()') + '">' +
+        (editing ? '수정 저장' : '목록에 추가') + '</button>' +
+      (editing ? '<button class="delete-btn" style="flex:0 0 auto; padding:14px 20px; margin-top:18px" onclick="deleteFromEdit(\'' + state.editingId + '\')">🗑 삭제</button>' : '') +
+    '</div>' +
     '</section>';
 
   /* 등록 영상 관리 */
@@ -882,10 +977,13 @@ function renderAdmin() {
     html += '<div class="empty-box">등록된 영상이 없습니다. 위에서 첫 영상을 추가해 보세요.</div>';
   } else {
     html += '<div class="video-list">';
+    const allCatsForRow = getAllCategories();
     videos.forEach((v, idx) => {
       const cat = v.category || "기타";
-      const catColor = CATEGORY_COLORS[cat] || CATEGORY_COLORS["기타"];
-      const catOptions = CATEGORIES.map(c =>
+      const catColor = colorForCategory(cat);
+      const availableCats = allCatsForRow.slice();
+      if (availableCats.indexOf(cat) === -1) availableCats.push(cat);
+      const catOptions = availableCats.map(c =>
         '<option value="' + esc(c) + '"' + (c === cat ? ' selected' : '') + '>' + esc(c) + '</option>'
       ).join('');
       html += '<div class="video-row">' +
@@ -943,6 +1041,38 @@ function onAdminUrl(value) {
     }
   } else { prev.innerHTML = ""; }
 }
+/* 카테고리 입력창(직접 입력) 토글 */
+function toggleCatInput() {
+  const btn = document.getElementById("catAddBtn");
+  const input = document.getElementById("a-cat-custom");
+  const select = document.getElementById("a-cat");
+  if (!input || !btn || !select) return;
+  const active = btn.classList.toggle("active");
+  input.classList.toggle("hidden", !active);
+  if (active) {
+    btn.textContent = "✕ 취소";
+    select.disabled = true;
+    select.style.opacity = "0.5";
+    setTimeout(() => input.focus(), 50);
+  } else {
+    btn.textContent = "+ 직접 입력";
+    input.value = "";
+    select.disabled = false;
+    select.style.opacity = "1";
+  }
+}
+function onCatSelectChange() { /* 자리만 유지 (추후 확장용) */ }
+/* 폼에서 최종 카테고리 값 결정 */
+function resolveCategoryInput() {
+  const btn = document.getElementById("catAddBtn");
+  const input = document.getElementById("a-cat-custom");
+  const select = document.getElementById("a-cat");
+  if (btn && btn.classList.contains("active") && input && input.value.trim()) {
+    return input.value.trim();
+  }
+  return (select && select.value) || "기본";
+}
+
 async function addVideo() {
   const url = document.getElementById("a-url").value;
   const vid = extractVideoId(url);
@@ -951,7 +1081,7 @@ async function addVideo() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  const category = (document.getElementById("a-cat") || {}).value || "기본";
+  const category = resolveCategoryInput();
 
   const maxOrder = videoCache.reduce((m, v) => Math.max(m, v.sort_order || 0), 0);
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "추가 중..."; }
@@ -979,7 +1109,7 @@ async function saveEdit() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  const category = (document.getElementById("a-cat") || {}).value || "기본";
+  const category = resolveCategoryInput();
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "저장 중..."; }
   const { error } = await sb.from("videos").update({
     video_id: vid, title, description, duration, category
@@ -987,6 +1117,17 @@ async function saveEdit() {
   if (error) { showAlert("수정 실패: " + error.message, { icon: "❌", title: "오류" }); if (btn) { btn.disabled = false; btn.textContent = "수정 저장"; } return; }
   await loadVideos();
   state.editingId = null;
+  renderAdmin();
+}
+/* 수정 중인 영상 바로 삭제 */
+async function deleteFromEdit(id) {
+  if (!id) return;
+  const ok = await showConfirm("수정 중인 이 영상을 삭제하시겠습니까?\n삭제한 영상은 복구할 수 없습니다.", { icon: "🗑️", title: "영상 삭제" });
+  if (!ok) return;
+  const { error } = await sb.from("videos").delete().eq("id", Number(id));
+  if (error) { showAlert("삭제 실패: " + error.message, { icon: "❌", title: "오류" }); return; }
+  state.editingId = null;
+  await loadVideos();
   renderAdmin();
 }
 async function deleteVideo(id) {
