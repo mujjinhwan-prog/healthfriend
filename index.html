@@ -32,13 +32,13 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
   header {
-    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 60%, var(--navy) 100%);
     color: #fff;
     padding: 22px 0;
-    box-shadow: 0 2px 14px rgba(20,71,42,.25);
+    box-shadow: 0 2px 14px rgba(20,71,42,.3);
   }
   .header-inner {
-    max-width: 760px; margin: 0 auto; padding: 0 20px;
+    max-width: 1160px; margin: 0 auto; padding: 0 20px;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 14px;
   }
@@ -62,10 +62,17 @@
     border: 1px solid rgba(255,255,255,.35); border-radius: 999px;
     padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;
     font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center;
+    line-height: 1;
   }
   .nav-btn.active { background: #fff; color: var(--teal-dark); }
+  /* 아이콘 전용 둥근 버튼 (관리자) */
+  .nav-icon-btn {
+    width: 32px; height: 32px; padding: 0; font-size: 15px;
+  }
+  .nav-icon-btn.active { background: #fff; }
 
-  main { max-width: 760px; margin: 0 auto; padding: 26px 20px 60px; }
+  main { max-width: 1160px; margin: 0 auto; padding: 26px 20px 60px; }
 
   .banner {
     background: var(--teal-soft); border: 1px solid rgba(31,107,58,.2);
@@ -119,7 +126,7 @@
   .video-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--teal); flex-shrink: 0; }
   .thumb {
     width: 100px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px;
-    flex-shrink: 0; background: #e6efe6; display: block;
+    flex-shrink: 0; background: #e2e5eb; display: block;
   }
   .video-info { flex: 1; min-width: 0; }
   .video-title {
@@ -132,13 +139,13 @@
     font-size: 12.5px; color: var(--muted); margin-top: 2px; line-height: 1.4;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .video-meta { display: flex; gap: 12px; font-size: 12px; color: #8a9a98; margin-top: 4px; align-items: center; flex-wrap: wrap; }
+  .video-meta { display: flex; gap: 12px; font-size: 12px; color: #7a869a; margin-top: 4px; align-items: center; flex-wrap: wrap; }
   .video-meta a { color: var(--teal); text-decoration: none; font-weight: 600; }
 
   /* === 사용자 페이지 전용: 3열 카드 그리드 === */
   .video-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 14px;
   }
   .video-card {
@@ -152,7 +159,7 @@
   .video-card.checked { border: 2px solid var(--teal); background: #e8f0ea; }
   .video-card-thumb-wrap {
     position: relative;
-    width: 100%; aspect-ratio: 16 / 9; background: #e6efe6;
+    width: 100%; aspect-ratio: 16 / 9; background: #e2e5eb;
     overflow: hidden;
   }
   .video-card-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -173,7 +180,7 @@
   }
   .video-card-body { padding: 10px 12px 12px; flex: 1; display: flex; flex-direction: column; }
   .video-card-title {
-    font-weight: 700; font-size: 13.5px; line-height: 1.4;
+    font-weight: 700; font-size: 13px; line-height: 1.4;
     color: var(--navy);
     overflow: hidden; text-overflow: ellipsis;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
@@ -181,7 +188,7 @@
     min-height: 2.8em;
   }
   .video-card-desc {
-    font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+    font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.4;
     overflow: hidden; text-overflow: ellipsis;
     display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
   }
@@ -205,12 +212,20 @@
   .cat-tab:hover { border-color: var(--teal); color: var(--teal-dark); }
   .cat-tab.active { background: var(--teal); border-color: var(--teal); color: #fff; }
 
-  /* 태블릿: 2열 */
-  @media (max-width: 760px) {
+  /* 반응형: 중간 데스크탑 4열 */
+  @media (max-width: 1100px) {
+    .video-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  /* 좁은 데스크탑/큰 태블릿 3열 */
+  @media (max-width: 900px) {
+    .video-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  /* 태블릿 2열 */
+  @media (max-width: 640px) {
     .video-grid { grid-template-columns: repeat(2, 1fr); }
   }
-  /* 모바일: 1열 */
-  @media (max-width: 480px) {
+  /* 모바일 1열 */
+  @media (max-width: 420px) {
     .video-grid { grid-template-columns: 1fr; gap: 10px; }
     .video-card-title { font-size: 14px; }
   }
@@ -286,7 +301,7 @@
     display: flex; align-items: center; gap: 10px; margin-top: 8px;
     padding: 8px; background: var(--paper); border-radius: 10px;
   }
-  .preview-thumb { width: 100px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #e6efe6; }
+  .preview-thumb { width: 100px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; background: #e2e5eb; }
   .preview-title { font-size: 13px; font-weight: 600; line-height: 1.4; }
   .remove-btn {
     background: #fff; border: 1.5px solid #e0c0c0; color: var(--danger);
@@ -301,7 +316,7 @@
   }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
-  .label { display: block; font-size: 13px; font-weight: 600; color: #5a6b69; margin-bottom: 6px; }
+  .label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
   .submit-btn {
     margin-top: 18px; width: 100%;
     background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
@@ -315,7 +330,7 @@
     border: 1.5px solid var(--teal); border-radius: 12px; padding: 12px;
     font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
   }
-  .mail-note { font-size: 12.5px; color: #8a9a98; margin-top: 10px; line-height: 1.6; text-align: center; }
+  .mail-note { font-size: 12.5px; color: #7a869a; margin-top: 10px; line-height: 1.6; text-align: center; }
   .delete-btn {
     background: #fff; border: 1.5px solid #e0c0c0; color: var(--danger);
     border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600;
@@ -388,7 +403,7 @@
     </div>
     <nav>
       <button class="nav-btn active" id="navUser" onclick="showPage('user')">신청하기</button>
-      <button class="nav-btn" id="navAdmin" onclick="showPage('admin')">Admin</button>
+      <button class="nav-btn nav-icon-btn" id="navAdmin" onclick="showPage('admin')" aria-label="관리자" title="관리자">🔑</button>
     </nav>
   </div>
 </header>
@@ -500,16 +515,31 @@ async function loadVideos() {
 function getVideos() { return videoCache; } 
 
 /* ---------- state ---------- */
-const CATEGORIES = ["건강검진", "질환정보", "생활습관", "영양/식단", "운동/재활", "약물정보", "기타"];
+const CATEGORIES = ["기본", "닥터유 건강이야기", "건강검진", "만성질환", "기타질환", "기타"];
 const CATEGORY_COLORS = {
-  "건강검진": "#3ca44d",
-  "질환정보": "#d97757",
-  "생활습관": "#5b8def",
-  "영양/식단": "#e8a33d",
-  "운동/재활": "#8b5cf6",
-  "약물정보": "#06a0a0",
-  "기타": "#8a9a98",
+  "기본": "#2a3b5c",
+  "닥터유 건강이야기": "#1f6b3a",
+  "건강검진": "#5b8def",
+  "만성질환": "#d97757",
+  "기타질환": "#8b5cf6",
+  "기타": "#7a869a",
 };
+/* 기본 카테고리 + 저장된 영상들에서 실제로 쓰이는 카테고리 (중복 제거) */
+function getAllCategories() {
+  const used = new Set();
+  (videoCache || []).forEach(v => { if (v.category) used.add(v.category); });
+  const result = [...CATEGORIES];
+  used.forEach(c => { if (result.indexOf(c) === -1) result.push(c); });
+  return result;
+}
+/* 커스텀 카테고리를 위한 색상 (해시 기반 자동 생성) */
+const CUSTOM_COLOR_PALETTE = ["#0ea5e9", "#14b8a6", "#f59e0b", "#ec4899", "#10b981", "#6366f1", "#f43f5e", "#06b6d4"];
+function colorForCategory(cat) {
+  if (CATEGORY_COLORS[cat]) return CATEGORY_COLORS[cat];
+  let hash = 0;
+  for (let i = 0; i < cat.length; i++) hash = (hash * 31 + cat.charCodeAt(i)) >>> 0;
+  return CUSTOM_COLOR_PALETTE[hash % CUSTOM_COLOR_PALETTE.length];
+}
 let state = {
   page: "user",
   checked: {},
@@ -838,7 +868,7 @@ function renderAdmin() {
         '<input class="txt" id="a-dur" type="text" placeholder="예: 12:34" value="' + esc(editing ? editing.duration : "") + '" /></div>' +
       '<div><label class="label">카테고리 (종류)</label>' +
         '<select class="txt" id="a-cat">' +
-          CATEGORIES.map(c => '<option value="' + esc(c) + '"' + ((editing && editing.category === c) || (!editing && c === "기타") ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
+          CATEGORIES.map(c => '<option value="' + esc(c) + '"' + ((editing && editing.category === c) || (!editing && c === "기본") ? ' selected' : '') + '>' + esc(c) + '</option>').join('') +
         '</select></div>' +
     '</div>' +
     '<button class="submit-btn" onclick="' + (editing ? 'saveEdit()' : 'addVideo()') + '">' +
@@ -921,7 +951,7 @@ async function addVideo() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  const category = (document.getElementById("a-cat") || {}).value || "기타";
+  const category = (document.getElementById("a-cat") || {}).value || "기본";
 
   const maxOrder = videoCache.reduce((m, v) => Math.max(m, v.sort_order || 0), 0);
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "추가 중..."; }
@@ -949,7 +979,7 @@ async function saveEdit() {
   if (!title) { showAlert("영상 제목을 입력해 주세요.", { icon: "⚠️", title: "입력 확인" }); return; }
   const description = document.getElementById("a-desc").value.trim();
   const duration = document.getElementById("a-dur").value.trim();
-  const category = (document.getElementById("a-cat") || {}).value || "기타";
+  const category = (document.getElementById("a-cat") || {}).value || "기본";
   const btn = document.querySelector("#adminPage .submit-btn"); if (btn) { btn.disabled = true; btn.textContent = "저장 중..."; }
   const { error } = await sb.from("videos").update({
     video_id: vid, title, description, duration, category
